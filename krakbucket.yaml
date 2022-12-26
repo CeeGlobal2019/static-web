@@ -1,0 +1,35 @@
+Description: > 
+  This template creates an S3 bucket and configures it to host a static website.
+Resources:
+  KrakBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: krak1989
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: error.html
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+        IgnorePublicAcls: false
+        BlockPublicPolicy: false
+        RestrictPublicBuckets: false
+  BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref KrakBucket
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal: "*"
+            Action: "s3:GetObject"
+            Resource: !Join
+              - ''
+              - - 'arn:aws:s3:::'
+                - !Ref KrakBucket
+                - /*
+
+
+
+
+
