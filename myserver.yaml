@@ -56,23 +56,39 @@ Resources:
         - IpProtocol: tcp
           FromPort: 22
           ToPort: 22
-          CidrIp: 0.0.0.0/0
+          CidrIp: 0.0.0.0/0 ami-0ceecbb0f30a902a6
+ 
   EC2Instance:
-    Type: AWS::EC2::Instance
+    Type: 'AWS::EC2::Instance'
     Properties:
+      ImageId: ami-12345678
       InstanceType: t2.micro
-      ImageId: ami-0ff8a91507f77f867
-      SubnetId: !Ref Subnet
-      SecurityGroupIds:
-        - !Ref SecurityGroup
-      KeyName: mykey
-      AssociatePublicIpAddress: true
-      IamInstanceProfile: !Ref InstanceProfile
-      UserData:
-        Fn::Base64: !Sub |
-          #!/bin/bash
-          echo "Hello, World" > index.html
-          nohup busybox httpd -f -p 8080 &
-Outputs:
-  PublicIP:
-    Description: ReferencesPublic ip
+      KeyName: krak123
+      IamInstanceProfile: !Ref EC2InstanceProfile
+  EC2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+      - !Ref EC2InstanceRole
+  EC2InstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - ec2.amazonaws.com
+          Action:
+          - 'sts:AssumeRole'
+      Path: /
+      Policies:
+      - PolicyName: EC2InstancePolicy
+        PolicyDocument:
+          Version: 2012-10-17
+          Statement:
+          - Effect: Allow
+            Action:
+            - 'ec2:*'
+            Resource: '*'
